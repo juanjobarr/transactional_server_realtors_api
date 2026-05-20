@@ -42,7 +42,7 @@ def list_topics(db: Session = Depends(get_db)) -> list[VideoTopicResponse]:
 
 
 @router.post("/script", response_model=GenerateScriptResponse)
-async def generate_script(
+def generate_script(
     topic_id: str = Form(...),
     tone: str = Form(...),
     title: Optional[str] = Form(None),
@@ -64,7 +64,7 @@ async def generate_script(
                     f"Allowed: {sorted(_ALLOWED_IMAGE_MIMES)}"
                 ),
             )
-        image_bytes = await reference_image.read()
+        image_bytes = reference_image.file.read()
         image_mime = reference_image.content_type
         image_filename = reference_image.filename
 
