@@ -12,12 +12,7 @@ class VideoModel(Base):
     __tablename__ = "videos"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("video_jobs.id", ondelete="CASCADE"),
-        unique=True,
-        nullable=True,
-    )
+    job_id = Column(UUID(as_uuid=True), unique=True, nullable=True)
     draft_id = Column(
         UUID(as_uuid=True),
         ForeignKey("video_drafts.id", ondelete="CASCADE"),
