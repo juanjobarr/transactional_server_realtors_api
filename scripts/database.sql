@@ -211,7 +211,8 @@ CREATE TABLE video_job_events (
 
 CREATE TABLE videos (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    job_id UUID NOT NULL UNIQUE REFERENCES video_jobs(id) ON DELETE CASCADE,
+    job_id UUID NULL UNIQUE REFERENCES video_jobs(id) ON DELETE CASCADE,
+    draft_id UUID NULL UNIQUE REFERENCES video_drafts(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     topic_id UUID NOT NULL REFERENCES video_topics(id),
@@ -250,5 +251,7 @@ CREATE TABLE webhook_events (
 
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_video_drafts_user_id ON video_drafts(user_id);
+CREATE INDEX idx_video_drafts_user_created_at ON video_drafts(user_id, created_at DESC);
 CREATE INDEX idx_video_jobs_draft_id ON video_jobs(draft_id);
 CREATE INDEX idx_videos_user_id ON videos(user_id);
+CREATE INDEX idx_videos_draft_id ON videos(draft_id);

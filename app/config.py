@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     AZURE_STORAGE_CONNECTION_STRING: str
     AZURE_STORAGE_CONTAINER_NAME: str = "reference-images"
 
+    MOCK_GENERATED_VIDEO_URL: str = (
+        "https://marketingstoragecenter.blob.core.windows.net/final-generated-videos/"
+        "final_podcast_videos/20260520_195939_332953d7.mp4"
+        "?se=2026-05-27T20%3A02%3A37Z&sp=r&sv=2026-04-06&sr=b"
+        "&sig=v1sK1bmnjHut/EJ2D1Sjg8Fg1GehijrZ7FO9lu/s3X4%3D"
+    )
+
     model_config = {"env_file": ".env", "case_sensitive": True}
 
 

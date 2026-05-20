@@ -1,3 +1,6 @@
+from datetime import datetime, timezone
+from typing import Optional
+
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -33,6 +36,27 @@ class SQLAlchemyScriptVersionRepository(ScriptVersionRepositoryPort):
             .scalar()
         )
         return (current_max or 0) + 1
+
+    def find_latest_by_draft_id(self, draft_id: str) -> Optional[ScriptVersion]:
+        row = (
+            self.db.query(ScriptVersionModel)
+            .filter(ScriptVersionModel.draft_id == draft_id)
+            .order_by(ScriptVersionModel.version_number.desc())
+            .first()
+        )
+        return self._to_entity(row) if row else None
+
+    def mark_approved(self, version_id: str, approver_user_id: str) -> None:
+        self.db.query(ScriptVersionModel).filter(
+            ScriptVersionModel.id == version_id
+        ).update(
+            {
+                "is_approved": True,
+                "approved_by_user_id": approver_user_id,
+                "approved_at": datetime.now(timezone.utc),
+            }
+        )
+        self.db.commit()
 
     @staticmethod
     def _to_entity(row: ScriptVersionModel) -> ScriptVersion:

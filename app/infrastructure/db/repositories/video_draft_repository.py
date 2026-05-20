@@ -1,3 +1,7 @@
+from datetime import datetime, timezone
+from typing import Optional
+
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.domain.entities.video_draft import VideoDraft
@@ -45,6 +49,51 @@ class SQLAlchemyVideoDraftRepository(VideoDraftRepositoryPort):
             sort_order=sort_order,
         )
         self.db.add(model)
+        self.db.commit()
+
+    def list_by_user(
+        self,
+        user_id: str,
+        limit: int,
+        offset: int,
+    ) -> tuple[list[VideoDraft], int]:
+        total = (
+            self.db.query(func.count(VideoDraftModel.id))
+            .filter(VideoDraftModel.user_id == user_id)
+            .scalar()
+        ) or 0
+        rows = (
+            self.db.query(VideoDraftModel)
+            .filter(VideoDraftModel.user_id == user_id)
+            .order_by(VideoDraftModel.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
+        return [self._to_entity(r) for r in rows], total
+
+    def find_by_id_and_user(
+        self,
+        draft_id: str,
+        user_id: str,
+    ) -> Optional[VideoDraft]:
+        row = (
+            self.db.query(VideoDraftModel)
+            .filter(
+                VideoDraftModel.id == draft_id,
+                VideoDraftModel.user_id == user_id,
+            )
+            .first()
+        )
+        return self._to_entity(row) if row else None
+
+    def update_status(self, draft_id: str, status: str) -> None:
+        self.db.query(VideoDraftModel).filter(VideoDraftModel.id == draft_id).update(
+            {
+                "status": status,
+                "updated_at": datetime.now(timezone.utc),
+            }
+        )
         self.db.commit()
 
     @staticmethod

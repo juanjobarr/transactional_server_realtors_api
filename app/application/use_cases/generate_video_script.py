@@ -11,6 +11,7 @@ from app.domain.ports.script_generator import ScriptGeneratorPort
 from app.domain.ports.script_version_repository import ScriptVersionRepositoryPort
 from app.domain.ports.video_draft_repository import VideoDraftRepositoryPort
 from app.domain.ports.video_topic_repository import VideoTopicRepositoryPort
+from app.domain.value_objects.video_draft_status import VideoDraftStatus
 
 
 class GenerateVideoScript:
@@ -48,7 +49,7 @@ class GenerateVideoScript:
             title=command.title or "Untitled",
             tone=command.tone,
             pacing="Medium",
-            status="draft",
+            status=VideoDraftStatus.DRAFTED.value,
             current_step="script",
             description=command.notes,
         )
@@ -79,6 +80,9 @@ class GenerateVideoScript:
             script_text=script_text,
         )
         version = self.version_repo.create(version_entity)
+
+        if draft.id:
+            self.draft_repo.update_status(draft.id, VideoDraftStatus.SCRIPTED.value)
 
         return GenerateScriptResponse(
             script=script_text,
