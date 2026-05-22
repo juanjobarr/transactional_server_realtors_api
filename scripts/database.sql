@@ -7,6 +7,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- CLEANUP
 -- =========================================================
 
+DROP TABLE IF EXISTS user_avatars CASCADE;
 DROP TABLE IF EXISTS webhook_events CASCADE;
 DROP TABLE IF EXISTS video_job_events CASCADE;
 DROP TABLE IF EXISTS videos CASCADE;
@@ -249,9 +250,31 @@ CREATE TABLE webhook_events (
 -- INDEXES
 -- =========================================================
 
+-- =========================================================
+-- USER AVATARS
+-- =========================================================
+
+CREATE TABLE user_avatars (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'pending',
+    additional_instructions TEXT NULL,
+    reference_image_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
+    avatar_url TEXT NULL,
+    external_job_id TEXT NULL,
+    error_message TEXT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- =========================================================
+-- INDEXES
+-- =========================================================
+
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_video_drafts_user_id ON video_drafts(user_id);
 CREATE INDEX idx_video_drafts_user_created_at ON video_drafts(user_id, created_at DESC);
 CREATE INDEX idx_video_jobs_draft_id ON video_jobs(draft_id);
 CREATE INDEX idx_videos_user_id ON videos(user_id);
 CREATE INDEX idx_videos_draft_id ON videos(draft_id);
+CREATE INDEX idx_user_avatars_external_job_id ON user_avatars(external_job_id);

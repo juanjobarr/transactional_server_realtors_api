@@ -31,6 +31,13 @@ class Settings(BaseSettings):
         "&sig=v1sK1bmnjHut/EJ2D1Sjg8Fg1GehijrZ7FO9lu/s3X4%3D"
     )
 
+    AVATAR_SERVICE_URL: str = "http://localhost:9000/avatars"
+    AVATAR_PUBLIC_CALLBACK_BASE_URL: str = "http://localhost:8000"
+    AZURE_STORAGE_AVATAR_CONTAINER_NAME: str = "user-avatars"
+    AVATAR_MAX_REFERENCE_IMAGES: int = 8
+    AVATAR_MAX_IMAGE_BYTES: int = 10 * 1024 * 1024
+    AVATAR_SERVICE_TIMEOUT_SECONDS: float = 10.0
+
     model_config = {"env_file": ".env", "case_sensitive": True}
 
 
